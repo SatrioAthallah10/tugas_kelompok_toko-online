@@ -1,0 +1,31 @@
+body { 
+    font-family: sans-serif; 
+    padding: 20px; 
+}
+
+table { 
+    border-collapse: collapse; 
+    width: 100%; 
+}
+
+th, td { 
+    border: 1px solid #ddd; 
+    padding: 8px; 
+    text-align: left; 
+}
+
+th { 
+    background-color: #f2f2f2; 
+}
+
+.btn-beli { 
+    background-color: #4CAF50; 
+    color: white; 
+    padding: 5px 10px; 
+    text-decoration: none; 
+    border-radius: 3px;
+}
+
+.btn-beli:hover {
+    background-color: #45a049;
+}
