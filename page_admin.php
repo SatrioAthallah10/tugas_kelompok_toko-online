@@ -69,56 +69,68 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     </table>
 
     <hr>
-        <h3>📋 Daftar Pesanan Masuk (Butuh ACC)</h3>
+    <h3>📋 Daftar Pesanan Masuk (Butuh ACC)</h3>
 
-        <table border="1" cellpadding="10" cellspacing="0" width="100%">
-            <thead>
-                <tr style="background-color: #ddd;">
-                    <th>No. Reservasi</th>
-                    <th>Pembeli</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // LOGIKA JOIN 3 TABEL
-                $query_pesanan = "SELECT k.*, u.USERNAME, p.NAMA_PRODUK 
-                                FROM keranjang k 
-                                JOIN user u ON k.ID_USER = u.ID_USER 
-                                JOIN daftar_produk p ON k.ID_PRODUK = p.ID_PRODUK 
-                                WHERE k.STATUS = 'Pending' 
-                                ORDER BY k.ID_PESANAN DESC";
-                
-                $result_pesanan = mysqli_query($koneksi, $query_pesanan);
+    <table border="1" cellpadding="10" cellspacing="0" width="100%">
+        <thead>
+            <tr style="background-color: #ddd;">
+                <th>No. Reservasi</th>
+                <th>Pembeli</th>
+                <th>Barang (Jml)</th>
+                <th>Total Harga</th>
+                <th>Bukti Transfer</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // JOIN Tabel
+            $query_pesanan = "SELECT k.*, u.USERNAME, p.NAMA_PRODUK, p.HARGA_PRODUK 
+                            FROM keranjang k 
+                            JOIN user u ON k.ID_USER = u.ID_USER 
+                            JOIN daftar_produk p ON k.ID_PRODUK = p.ID_PRODUK 
+                            WHERE k.STATUS = 'Pending' 
+                            ORDER BY k.ID_PESANAN DESC";
+            
+            $result_pesanan = mysqli_query($koneksi, $query_pesanan);
 
-                if (mysqli_num_rows($result_pesanan) > 0) {
-                    while ($row = mysqli_fetch_assoc($result_pesanan)) {
-                ?>
-                    <tr>
-                        <td><?php echo $row['NOMOR_RESERVASI']; ?></td>
-                        <td><?php echo $row['USERNAME']; ?></td>
-                        <td><?php echo $row['NAMA_PRODUK']; ?></td>
-                        <td><?php echo $row['JUMLAH_PRODUK']; ?></td>
-                        <td style="color: red; font-weight: bold;"><?php echo $row['STATUS']; ?></td>
-                        <td>
-                            <a href="acc_pembayaran.php?id=<?php echo $row['ID_PESANAN']; ?>" 
-                            onclick="return confirm('ACC Pembayaran ini?')"
-                            style="background: blue; color: white; padding: 5px; text-decoration: none;">
-                            ✅ ACC Pembayaran
+            if (mysqli_num_rows($result_pesanan) > 0) {
+                while ($row = mysqli_fetch_assoc($result_pesanan)) {
+                    $total_bayar = $row['HARGA_PRODUK'] * $row['JUMLAH_PRODUK'];
+            ?>
+                <tr>
+                    <td><?php echo $row['NOMOR_RESERVASI']; ?></td>
+                    <td><?php echo $row['USERNAME']; ?></td>
+                    <td><?php echo $row['NAMA_PRODUK'] . " (" . $row['JUMLAH_PRODUK'] . ")"; ?></td>
+                    <td>Rp <?php echo number_format($total_bayar); ?></td>
+                    
+                    <td style="text-align: center;">
+                        <?php if (!empty($row['BUKTI_PEMBAYARAN'])) { ?>
+                            <a href="uploads/<?php echo $row['BUKTI_PEMBAYARAN']; ?>" target="_blank" 
+                               style="background: orange; padding: 5px; color: black; text-decoration: none; border-radius: 4px;">
+                                👁️ Lihat Bukti
                             </a>
-                        </td>
-                    </tr>
-                <?php
-                    }
-                } else {
-                    echo "<tr><td colspan='6' style='text-align:center'>Tidak ada pesanan baru.</td></tr>";
+                        <?php } else { ?>
+                            <span style="color: red; font-style: italic;">Belum Upload</span>
+                        <?php } ?>
+                    </td>
+
+                    <td>
+                        <a href="acc_pembayaran.php?id=<?php echo $row['ID_PESANAN']; ?>" 
+                        onclick="return confirm('Sudah cek bukti pembayaran? Yakin ACC?')"
+                        style="background: blue; color: white; padding: 5px; text-decoration: none; border-radius: 4px;">
+                        ✅ Verifikasi & ACC
+                        </a>
+                    </td>
+                </tr>
+            <?php
                 }
-                ?>
-            </tbody>
-        </table>
+            } else {
+                echo "<tr><td colspan='6' style='text-align:center'>Tidak ada pesanan baru.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
 
     <br>
     <a href="logout.php">Logout</a>

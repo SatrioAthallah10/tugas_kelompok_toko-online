@@ -42,6 +42,17 @@ $result = mysqli_query($koneksi, $query);
         🛒 Lihat Keranjang
     </a>
 
+    <a href="lihat_sejarah.php" style="
+        background-color: #6f42c1; 
+        color: white; 
+        padding: 10px 15px; 
+        text-decoration: none; 
+        border-radius: 5px; 
+        margin-right: 10px; 
+        font-weight: bold;">
+        📜 Riwayat Pembayaran
+    </a>
+
     <a href="logout.php" style="
         background-color: #dc3545;
         color: white; 
