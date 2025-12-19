@@ -1,8 +1,6 @@
 <?php
 session_start();
 include 'koneksi.php';
-
-// 1. Cek Login Pembeli
 if (!isset($_SESSION['id_user']) || $_SESSION['role'] != 'pembeli') {
     header("Location: login.php");
     exit();
@@ -41,8 +39,6 @@ $id_user = $_SESSION['id_user'];
         </thead>
         <tbody>
             <?php
-            // QUERY JOIN 3 TABEL SESUAI ERD
-            // Kita ambil sejarah pembayaran, tapi difilter HANYA milik user yang sedang login
             $query = "SELECT sp.SEJARAH, k.NOMOR_RESERVASI, k.BUKTI_PEMBAYARAN, p.NAMA_PRODUK 
                       FROM sejarah_pembayaran sp
                       JOIN keranjang k ON sp.ID_PESANAN = k.ID_PESANAN

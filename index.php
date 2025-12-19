@@ -1,15 +1,10 @@
 <?php
 session_start();
 include 'koneksi.php';
-
-// Cek apakah user sudah login, jika belum lempar ke login
-// Opsional: Hapus blok IF ini jika user boleh lihat barang tanpa login
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login") {
     header("Location: login.php");
     exit;
 }
-
-// Ambil data produk
 $query = "SELECT * FROM daftar_produk";
 $result = mysqli_query($koneksi, $query);
 ?>
@@ -20,7 +15,6 @@ $result = mysqli_query($koneksi, $query);
     <title>Toko Online - Halaman Pembeli</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
-        /* CSS Sederhana untuk Chatbot */
         .chat-container { border: 2px solid #333; padding: 20px; width: 60%; margin: 20px auto; background: #fff; border-radius: 8px; }
         .bot-response { background-color: #e6f7ff; padding: 10px; border: 1px solid #1890ff; margin-top: 10px; border-radius: 5px; }
         .user-label { font-weight: bold; color: #555; }
@@ -62,8 +56,6 @@ $result = mysqli_query($koneksi, $query);
         Logout
     </a>
 </div>
-
-    <!-- DAFTAR PRODUK -->
     <h2 style="text-align:center;">Daftar Produk</h2>
     <table border="1" style="width: 80%; margin: 0 auto;">
         <thead>
@@ -107,8 +99,6 @@ $result = mysqli_query($koneksi, $query);
     </table>
 
     <br><hr><br>
-
-    <!-- FITUR CHAT ASSISTANT (DATABASE BASED) -->
     <div class="chat-container">
         <h3>💬 Tanya Asisten Toko</h3>
         <p><i>Coba ketik: "rekening", "pengiriman", "garansi", atau "rusak"</i></p>
@@ -122,9 +112,7 @@ $result = mysqli_query($koneksi, $query);
         if (isset($_POST['btn_chat'])) {
             $input_user = $_POST['pertanyaan'];
             $input_user_aman = mysqli_real_escape_string($koneksi, $input_user);
-            $id_user_aktif = $_SESSION['id_user']; // Ambil ID user yang sedang login
-
-            // 1. LOGIKA PENCARIAN KEYWORD
+            $id_user_aktif = $_SESSION['id_user'];
             $query_bot = "SELECT JAWABAN FROM bot 
                           WHERE '$input_user_aman' LIKE CONCAT('%', KATA_KUNCI, '%') 
                           LIMIT 1";
@@ -135,12 +123,9 @@ $result = mysqli_query($koneksi, $query);
             echo "<span class='user-label'>Kamu:</span> " . htmlspecialchars($input_user) . "<br><br>";
             
             if ($result_bot && mysqli_num_rows($result_bot) > 0) {
-                // KASUS A: Keyword Ditemukan
                 $data_bot = mysqli_fetch_assoc($result_bot);
                 echo "<span class='user-label' style='color:blue;'>Bot:</span> " . $data_bot['JAWABAN'];
             } else {
-                // KASUS B: Keyword TIDAK Ditemukan (AUTO REPORT KE ADMIN)
-                // Catat ke tabel keluhan_user
                 $query_lapor = "INSERT INTO keluhan_user (ID_USER, ISI_PESAN) 
                                 VALUES ('$id_user_aktif', '$input_user_aman')";
                 mysqli_query($koneksi, $query_lapor);

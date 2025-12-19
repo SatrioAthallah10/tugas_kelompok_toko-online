@@ -84,7 +84,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
         </thead>
         <tbody>
             <?php
-            // JOIN Tabel
             $query_pesanan = "SELECT k.*, u.USERNAME, p.NAMA_PRODUK, p.HARGA_PRODUK 
                             FROM keranjang k 
                             JOIN user u ON k.ID_USER = u.ID_USER 
@@ -108,7 +107,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
                         <?php if (!empty($row['BUKTI_PEMBAYARAN'])) { ?>
                             <a href="uploads/<?php echo $row['BUKTI_PEMBAYARAN']; ?>" target="_blank" 
                                style="background: orange; padding: 5px; color: black; text-decoration: none; border-radius: 4px;">
-                                👁️ Lihat Bukti
+                                Lihat Bukti
                             </a>
                         <?php } else { ?>
                             <span style="color: red; font-style: italic;">Belum Upload</span>
@@ -117,9 +116,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
 
                     <td>
                         <a href="acc_pembayaran.php?id=<?php echo $row['ID_PESANAN']; ?>" 
-                        onclick="return confirm('Sudah cek bukti pembayaran? Yakin ACC?')"
+                        onclick="return confirm('Sudah cek bukti pembayaran?')"
                         style="background: blue; color: white; padding: 5px; text-decoration: none; border-radius: 4px;">
-                        ✅ Verifikasi & ACC
+                        ✅ Verifikasi
                         </a>
                     </td>
                 </tr>
@@ -136,7 +135,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     <a href="logout.php">Logout</a>
 
     <hr>
-    <h3 style="color: darkred;">📩 Pesan User (Gagal Dijawab Bot)</h3>
+    <h3 style="color: darkred;">📩 Pesan User</h3>
     <p>Daftar pertanyaan user yang tidak ada di database keyword. Perlu respon manual.</p>
 
     <table border="1" cellpadding="10" cellspacing="0" width="100%">
@@ -151,7 +150,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
         </thead>
         <tbody>
             <?php
-            // Join ke tabel user untuk tahu siapa yang nanya
             $query_keluhan = "SELECT k.*, u.USERNAME 
                               FROM keluhan_user k 
                               JOIN user u ON k.ID_USER = u.ID_USER 

@@ -5,25 +5,17 @@ include 'koneksi.php';
 if (isset($_POST['btn_login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-
-    // Sanitasi input agar aman
     $username = mysqli_real_escape_string($koneksi, $username);
     $password = mysqli_real_escape_string($koneksi, $password);
-
-    // Cek user di database
     $query = "SELECT * FROM user WHERE USERNAME = '$username' AND PASSWORD = '$password'";
     $result = mysqli_query($koneksi, $query);
 
     if (mysqli_num_rows($result) > 0) {
         $data = mysqli_fetch_assoc($result);
-
-        // SET SESSION
         $_SESSION['username'] = $username;
-        $_SESSION['role'] = $data['ROLE']; // Pastikan nama kolom di DB sesuai (Case Sensitive kadang berpengaruh)
+        $_SESSION['role'] = $data['ROLE'];
         $_SESSION['id_user'] = $data['ID_USER'];
         $_SESSION['status'] = "login";
-
-        // LOGIKA PENGARAHAN HALAMAN (REDIRECT)
         if ($data['ROLE'] == "admin") {
             header("Location: page_admin.php");
         } else if ($data['ROLE'] == "pemilik") {

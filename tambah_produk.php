@@ -2,21 +2,15 @@
 session_start();
 include 'koneksi.php';
 
-// 1. CEK KEAMANAN: Apakah user sudah login DAN apakah role-nya 'pemilik'?
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'pemilik') {
-    // Jika bukan pemilik, tendang ke halaman login atau tampilkan pesan error
     echo "<script>alert('Akses Ditolak! Anda bukan Pemilik.'); window.location='login.php';</script>";
     exit;
 }
 
-// 2. PROSES FORM JIKA TOMBOL 'SIMPAN' DITEKAN
 if (isset($_POST['simpan'])) {
-    // Ambil data dari form
     $nama_produk = $_POST['nama_produk'];
     $harga_produk = $_POST['harga_produk'];
     $stok_produk = $_POST['stok_produk'];
-
-    // Query INSERT sesuai atribut ERD (ID_PRODUK otomatis auto-increment)
     $query = "INSERT INTO daftar_produk (NAMA_PRODUK, HARGA_PRODUK, STOK_PRODUK) 
               VALUES ('$nama_produk', '$harga_produk', '$stok_produk')";
     

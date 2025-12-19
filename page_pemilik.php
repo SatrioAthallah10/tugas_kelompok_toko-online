@@ -1,8 +1,6 @@
 <?php
 session_start();
 include 'koneksi.php';
-
-// Cek sesi pemilik
 if ($_SESSION['role'] != 'pemilik') {
     header("Location: login.php");
     exit;
@@ -44,8 +42,6 @@ if ($_SESSION['role'] != 'pemilik') {
             echo "<td>" . $row['NAMA_PRODUK'] . "</td>";
             echo "<td>Rp " . number_format($row['HARGA_PRODUK'], 0, ',', '.') . "</td>";
             echo "<td>" . $row['STOK_PRODUK'] . "</td>";
-            
-            // Tombol Aksi: Mengirim ID_PRODUK via metode GET
             echo "<td>
                     <a href='edit_produk.php?id=" . $row['ID_PRODUK'] . "'>Edit</a> | 
                     <a href='hapus_produk.php?id=" . $row['ID_PRODUK'] . "' onclick='return confirm(\"Yakin ingin menghapus?\")'>Hapus</a>

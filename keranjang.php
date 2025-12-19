@@ -1,8 +1,6 @@
 <?php
 session_start();
 include 'koneksi.php';
-
-// 1. Cek Login Pembeli
 if (!isset($_SESSION['id_user']) || $_SESSION['role'] != 'pembeli') {
     header("Location: login.php");
     exit();

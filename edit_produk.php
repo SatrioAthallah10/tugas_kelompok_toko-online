@@ -2,14 +2,11 @@
 session_start();
 include 'koneksi.php';
 
-// 1. CEK KEAMANAN: Hanya Pemilik
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'pemilik') {
     echo "<script>alert('Akses Ditolak!'); window.location='login.php';</script>";
     exit;
 }
 
-// 2. AMBIL DATA LAMA
-// Cek apakah ada ID di URL
 if (!isset($_GET['id'])) {
     header("Location: page_pemilik.php");
     exit;
@@ -20,19 +17,16 @@ $query_ambil = "SELECT * FROM daftar_produk WHERE ID_PRODUK = '$id'";
 $result_ambil = mysqli_query($koneksi, $query_ambil);
 $data = mysqli_fetch_assoc($result_ambil);
 
-// Jika data tidak ditemukan
 if (!$data) {
     echo "<script>alert('Data tidak ditemukan!'); window.location='page_pemilik.php';</script>";
     exit;
 }
 
-// 3. PROSES UPDATE SAAT TOMBOL DITEKAN
 if (isset($_POST['update'])) {
     $nama_baru = $_POST['nama_produk'];
     $harga_baru = $_POST['harga_produk'];
     $stok_baru = $_POST['stok_produk'];
 
-    // Query UPDATE
     $query_update = "UPDATE daftar_produk SET 
                      NAMA_PRODUK = '$nama_baru', 
                      HARGA_PRODUK = '$harga_baru', 
