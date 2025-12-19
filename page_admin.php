@@ -1,9 +1,127 @@
 <?php
 session_start();
-if($_SESSION['role'] != 'admin'){
-    die("Anda bukan Admin!");
+include 'koneksi.php';
+
+// Cek keamanan: Hanya Admin
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+    header("Location: login.php");
+    exit;
 }
 ?>
-<h1>Selamat Datang Yang Mulia Admin</h1>
-<p>Di sini tempat hapus-hapus data.</p>
-<a href="logout.php">Logout</a>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Admin</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; max-width: 800px; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn-hapus { background-color: #ff4444; color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; }
+        .btn-hapus:hover { background-color: #cc0000; }
+    </style>
+</head>
+<body>
+
+    <h1>Dashboard Admin</h1>
+    <p>Halo, Admin! Berikut adalah daftar pengguna aplikasi.</p>
+
+    <h3>Daftar Pengguna (Pemilik & Pembeli)</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID User</th>
+                <th>Username</th>
+                <th>Role (Peran)</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Ambil semua user KECUALI admin yang sedang login (biar gak hapus diri sendiri)
+            $id_saya = $_SESSION['id_user']; // Asumsi saat login kamu simpan id_user di session
+            $query = "SELECT * FROM user WHERE ROLE != 'admin'"; 
+            
+            $result = mysqli_query($koneksi, $query);
+
+            if(mysqli_num_rows($result) > 0){
+                while($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>";
+                    echo "<td>" . $row['ID_USER'] . "</td>";
+                    echo "<td>" . $row['USERNAME'] . "</td>";
+                    echo "<td>" . ucfirst($row['ROLE']) . "</td>"; // ucfirst biar huruf depan besar
+                    echo "<td>
+                            <a href='hapus_user.php?id=" . $row['ID_USER'] . "' 
+                               class='btn-hapus'
+                               onclick='return confirm(\"Yakin ingin menghapus user " . $row['USERNAME'] . "? Semua riwayat belanja mereka juga akan hilang.\")'>
+                               Hapus Akun
+                            </a>
+                          </td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='4' style='text-align:center'>Belum ada user lain.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+
+    <hr>
+        <h3>📋 Daftar Pesanan Masuk (Butuh ACC)</h3>
+
+        <table border="1" cellpadding="10" cellspacing="0" width="100%">
+            <thead>
+                <tr style="background-color: #ddd;">
+                    <th>No. Reservasi</th>
+                    <th>Pembeli</th>
+                    <th>Barang</th>
+                    <th>Jumlah</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // LOGIKA JOIN 3 TABEL
+                $query_pesanan = "SELECT k.*, u.USERNAME, p.NAMA_PRODUK 
+                                FROM keranjang k 
+                                JOIN user u ON k.ID_USER = u.ID_USER 
+                                JOIN daftar_produk p ON k.ID_PRODUK = p.ID_PRODUK 
+                                WHERE k.STATUS = 'Pending' 
+                                ORDER BY k.ID_PESANAN DESC";
+                
+                $result_pesanan = mysqli_query($koneksi, $query_pesanan);
+
+                if (mysqli_num_rows($result_pesanan) > 0) {
+                    while ($row = mysqli_fetch_assoc($result_pesanan)) {
+                ?>
+                    <tr>
+                        <td><?php echo $row['NOMOR_RESERVASI']; ?></td>
+                        <td><?php echo $row['USERNAME']; ?></td>
+                        <td><?php echo $row['NAMA_PRODUK']; ?></td>
+                        <td><?php echo $row['JUMLAH_PRODUK']; ?></td>
+                        <td style="color: red; font-weight: bold;"><?php echo $row['STATUS']; ?></td>
+                        <td>
+                            <a href="acc_pembayaran.php?id=<?php echo $row['ID_PESANAN']; ?>" 
+                            onclick="return confirm('ACC Pembayaran ini?')"
+                            style="background: blue; color: white; padding: 5px; text-decoration: none;">
+                            ✅ ACC Pembayaran
+                            </a>
+                        </td>
+                    </tr>
+                <?php
+                    }
+                } else {
+                    echo "<tr><td colspan='6' style='text-align:center'>Tidak ada pesanan baru.</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+
+    <br>
+    <a href="logout.php">Logout</a>
+
+</body>
+</html>
