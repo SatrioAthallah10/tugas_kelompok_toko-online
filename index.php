@@ -111,7 +111,7 @@ $result = mysqli_query($koneksi, $query);
     <!-- FITUR CHAT ASSISTANT (DATABASE BASED) -->
     <div class="chat-container">
         <h3>💬 Tanya Asisten Toko</h3>
-        <p><i>Coba ketik kata kunci: "paket", "lama", "resi", atau "halo"</i></p>
+        <p><i>Coba ketik: "rekening", "pengiriman", "garansi", atau "rusak"</i></p>
         
         <form method="POST" action="">
             <input type="text" name="pertanyaan" placeholder="Ketik pesan kamu..." style="width: 70%; padding: 10px;" required>
@@ -122,10 +122,10 @@ $result = mysqli_query($koneksi, $query);
         if (isset($_POST['btn_chat'])) {
             $input_user = $_POST['pertanyaan'];
             $input_user_aman = mysqli_real_escape_string($koneksi, $input_user);
+            $id_user_aktif = $_SESSION['id_user']; // Ambil ID user yang sedang login
 
-            // LOGIKA PENCARIAN KEYWORD
-            // Mencari apakah di kalimat user mengandung kata kunci dari database
-            $query_bot = "SELECT JAWABAN FROM BOT 
+            // 1. LOGIKA PENCARIAN KEYWORD
+            $query_bot = "SELECT JAWABAN FROM bot 
                           WHERE '$input_user_aman' LIKE CONCAT('%', KATA_KUNCI, '%') 
                           LIMIT 1";
             
@@ -135,10 +135,18 @@ $result = mysqli_query($koneksi, $query);
             echo "<span class='user-label'>Kamu:</span> " . htmlspecialchars($input_user) . "<br><br>";
             
             if ($result_bot && mysqli_num_rows($result_bot) > 0) {
+                // KASUS A: Keyword Ditemukan
                 $data_bot = mysqli_fetch_assoc($result_bot);
                 echo "<span class='user-label' style='color:blue;'>Bot:</span> " . $data_bot['JAWABAN'];
             } else {
-                echo "<span class='user-label' style='color:blue;'>Bot:</span> Maaf, saya belum mengerti. Silakan hubungi admin manual.";
+                // KASUS B: Keyword TIDAK Ditemukan (AUTO REPORT KE ADMIN)
+                // Catat ke tabel keluhan_user
+                $query_lapor = "INSERT INTO keluhan_user (ID_USER, ISI_PESAN) 
+                                VALUES ('$id_user_aktif', '$input_user_aman')";
+                mysqli_query($koneksi, $query_lapor);
+
+                echo "<span class='user-label' style='color:red;'>Bot:</span> Maaf, saya tidak mengerti pertanyaan itu.<br>";
+                echo "<i>(Sistem otomatis meneruskan pesan Anda ke Admin. Mohon tunggu respon manual).</i>";
             }
             echo "</div>";
         }

@@ -135,5 +135,56 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     <br>
     <a href="logout.php">Logout</a>
 
+    <hr>
+    <h3 style="color: darkred;">📩 Pesan User (Gagal Dijawab Bot)</h3>
+    <p>Daftar pertanyaan user yang tidak ada di database keyword. Perlu respon manual.</p>
+
+    <table border="1" cellpadding="10" cellspacing="0" width="100%">
+        <thead>
+            <tr style="background-color: #ffcccc;">
+                <th>No</th>
+                <th>Nama User</th>
+                <th>Isi Pesan / Pertanyaan</th>
+                <th>Waktu Masuk</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Join ke tabel user untuk tahu siapa yang nanya
+            $query_keluhan = "SELECT k.*, u.USERNAME 
+                              FROM keluhan_user k 
+                              JOIN user u ON k.ID_USER = u.ID_USER 
+                              ORDER BY k.WAKTU_KIRIM DESC";
+            
+            $result_keluhan = mysqli_query($koneksi, $query_keluhan);
+            $no_k = 1;
+
+            if (mysqli_num_rows($result_keluhan) > 0) {
+                while ($row_k = mysqli_fetch_assoc($result_keluhan)) {
+            ?>
+                <tr>
+                    <td><?php echo $no_k++; ?></td>
+                    <td><?php echo $row_k['USERNAME']; ?></td>
+                    <td>"<?php echo $row_k['ISI_PESAN']; ?>"</td>
+                    <td><?php echo $row_k['WAKTU_KIRIM']; ?></td>
+                    <td>
+                        <a href="hapus_keluhan.php?id=<?php echo $row_k['ID_KELUHAN']; ?>" 
+                           onclick="return confirm('Sudah dibaca? Hapus pesan ini?')"
+                           style="color: red;">
+                           [Hapus]
+                        </a>
+                    </td>
+                </tr>
+            <?php
+                }
+            } else {
+                echo "<tr><td colspan='5' style='text-align:center'>Tidak ada pesan keluhan baru.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+    <br><br>
+
 </body>
 </html>
